@@ -45,7 +45,23 @@ def register():
     print("Registration Succesfull Account No = ", acc_no, "balance = ", balance)
 
 def login():
-    print("login...")
+    account_no = input("Account no: ")
+    password = input("password:")
+
+    if not account_exist_in_db(account_no):
+        print("No Such Account Exists....")
+
+    else:
+        db = load_data_from_database()
+
+        for i, user_data in enumerate(db):
+            if user_data["account_number"] == account_no:
+                if db[i]["password"] == password:
+                    print("login to next window....")
+                    user_access_window(account_no)
+
+                else:
+                    print("incorrect Password")
 
     
 def home_window():
@@ -121,4 +137,69 @@ def password_check(password):
 
     return "valid"
 
+def check_balance(account_no):
+    db = load_data_from_database()
 
+    for user_data in db:
+        if user_data["account_number"] == account_no:
+            return user_data["balance"]
+
+
+def deposit_balance(account_no):
+    print("deposit money")
+
+def withdraw_balance(account_no):
+    user_current_balance = check_balance(account_no)
+
+    try: 
+        withdraw_amount = float(input("enter amount to withdraw: "))
+
+        if withdraw_amount <= 0:
+            print("negative balance can't be withdrwan...")
+
+        elif withdraw_amount >= user_current_balance:
+            print("insufficient fund balance...")
+
+        else:
+            print("money we will withdraw tomorrow...")
+    except:
+        print("invalid amount....")
+
+
+def transfermoney(account_no):
+    print("transfer money")
+
+def update_password(account_no):
+    print("update password")
+
+def user_access_window(account_no):
+    while True:
+        choice = input("""
+            1 : Check Balance
+            2 : Withdraw
+            3 : Deposit
+            4 : Transfer Money
+            5 : Password Update
+            6 : Exit
+            """)
+
+        if choice == "1":
+            print("Your current balance is ", check_balance(account_no))
+
+        elif choice == "2":
+            withdraw_balance(account_no)
+
+        elif choice == "3":
+            deposit_balance(account_no)
+
+        elif choice == "4":
+            transfermoney(account_no)
+
+        elif choice == "5":
+            update_password(account_no)
+
+        elif choice == "6":
+            break
+
+        else:
+            print("invalid choice try again...")
