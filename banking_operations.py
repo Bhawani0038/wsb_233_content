@@ -58,31 +58,33 @@ def login():
             if user_data["account_number"] == account_no:
                 if db[i]["password"] == password:
                     print("login to next window....")
-                    user_access_window(account_no)
+                    user_access_window(account_no, password)
 
                 else:
                     print("incorrect Password")
 
     
 def home_window():
-    print(3)
+
     print("----------APNA BANK---------")
+    try:
+        choice = input("""
+        1 : Register
+        2 : Login
+        3 : Exit
+        """)
 
-    choice = input("""
-    1 : Register
-    2 : Login
-    3 : Exit
-    """)
-
-    if choice == "1":
-        register()
+        if choice == "1":
+            register()
 
 
-    elif choice == "2":
-        login()
+        elif choice == "2":
+            login()
 
-    else:
-        exit()
+        else:
+            exit()
+    except:
+        print("invalid choice..exiting...")
 
 
 def generate_acc_no():
@@ -146,7 +148,29 @@ def check_balance(account_no):
 
 
 def deposit_balance(account_no):
-    print("deposit money")
+    user_current_balance = check_balance(account_no)
+
+    try: 
+        deposit_amount = float(input("enter amount to deposit: "))
+
+        if deposit_amount <= 0:
+            print("negative  or zero balance can't be deposited...")
+
+        else:
+            user_current_balance = user_current_balance  + deposit_amount
+            db = load_data_from_database()
+
+            for elem in db:
+                if elem["account_number"] == account_no:
+                    elem["balance"] = user_current_balance
+                    with open("customerdb.json", "w") as f:
+                        json.dump(db, f)
+                        print(f"{deposit_amount} deposited succesfully. new balance = {user_current_balance}" )
+                    break
+
+    except:
+        print("invalid amount....")
+
 
 def withdraw_balance(account_no):
     user_current_balance = check_balance(account_no)
@@ -157,11 +181,24 @@ def withdraw_balance(account_no):
         if withdraw_amount <= 0:
             print("negative balance can't be withdrwan...")
 
-        elif withdraw_amount >= user_current_balance:
+        elif withdraw_amount > user_current_balance:
             print("insufficient fund balance...")
 
         else:
-            print("money we will withdraw tomorrow...")
+            user_current_balance = user_current_balance - withdraw_amount
+            db = load_data_from_database()
+
+            for elem in db:
+                if elem["account_number"] == account_no:
+                    elem["balance"] = user_current_balance
+                    with open("customerdb.json", "w") as f:
+                        json.dump(db, f)
+                        print(f"{withdraw_amount} withdrawn succesfully. new balance = {user_current_balance}" )
+                    break
+            
+
+            
+        
     except:
         print("invalid amount....")
 
@@ -169,10 +206,28 @@ def withdraw_balance(account_no):
 def transfermoney(account_no):
     print("transfer money")
 
-def update_password(account_no):
-    print("update password")
+def update_password(account_no, password):
 
-def user_access_window(account_no):
+    while True:
+        new_password = input("password:")
+        if new_password != password:
+            print(password_check(new_password))
+
+            if password_check(new_password) == "valid":
+                db = load_data_from_database()
+                for elem in db:
+                    if elem["account_number"] == account_no:
+                        elem["password"] = new_password
+                        with open("customerdb.json", "w") as f:
+                            json.dump(db, f)
+                        print("password changed succesfully...")
+                        break
+
+                break
+        else:
+            print("you have added the same earlier password. try again...")
+
+def user_access_window(account_no, password):
     while True:
         choice = input("""
             1 : Check Balance
@@ -196,7 +251,7 @@ def user_access_window(account_no):
             transfermoney(account_no)
 
         elif choice == "5":
-            update_password(account_no)
+            update_password(account_no, password)
 
         elif choice == "6":
             break

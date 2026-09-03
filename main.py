@@ -1,4 +1,4 @@
-[
+li = [
     {
         "name": "A",
         "account_number": "ab233683",
@@ -14,8 +14,8 @@
     {
         "name": "C",
         "account_number": "ab911358",
-        "password": "23456sdfFGHJ345#$%",
-        "balance": 300.0
+        "password": "12345678",
+        "balance": 200
     },
     {
         "name": "Apple",
@@ -24,3 +24,9 @@
         "balance": 0
     }
 ]
+
+for elem in li:
+    if elem["account_number"] == "ab911358":
+        elem["balance"]  = 500
+
+print(li)
